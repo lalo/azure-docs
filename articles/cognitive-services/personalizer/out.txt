@@ -1,0 +1,229 @@
+concept-active-inactive-events.md
+18:When your application calls the Rank API, you receive the action, which the application should show in the **rewardActionId** field.  From that moment, Personalizer expects a Reward call with a reward score that has the same eventId. The reward score is used to train the model for future Rank calls. If no Reward call is received for the eventId, a default reward is applied. [Default rewards](how-to-settings.md#configure-rewards-for-the-feedback-loop) are set on your Personalizer resource in the Azure portal.
+
+concept-feature-evaluation.md
+4:description: When you run an Evaluation in your Personalizer resource from the Azure portal, Personalizer provides information about what features of context and actions are influencing the model. 
+17:When you run an Evaluation in your Personalizer resource from the [Azure portal](https://portal.azure.com), Personalizer provides information about what features of context and actions are influencing the model. 
+21:* Imagine additional features you could use, getting inspiration from what features are more important in the model.
+26:The more important features have stronger weights in the model. Because these features have stronger weight, they tend to be present when Personalizer obtains higher rewards.
+32:The resulting information about feature importance represents the current Personalizer online model. The evaluation analyzes feature importance of the model saved at the end date of the evaluation period, after undergoing all the training done during the evaluation, with the current online learning policy. 
+34:The feature importance results do not represent other policies and models tested or created during the evaluation.  The evaluation will not include features sent to Personalizer after the end of the evaluation period.
+55:Get inspiration from the more important features in the model. For example, if you see "Context.MobileBattery:Low" in a video mobile app, you may think that connection type may also make customers choose to see one video clip over another, then add features about connectivity type and bandwidth into your app.
+74:* With large numbers of users, it is unlikely that each user's interaction will weigh more than all the population's interaction, so sending user IDs (even if non-PII) will probably add more noise than value to the model.
+
+concepts-exploration.md
+4:description: With exploration, Personalizer is able to continue delivering good results, even as user behavior changes. Choosing an exploration setting is a business decision about the proportion of user interactions to explore with, in order to improve the model.
+20:* Uses exploitation to match the most probable user behavior based on the current machine learning model.
+33:Choosing an exploration setting is a business decision about the proportion of user interactions to explore with, in order to improve the model. 
+35:A setting of zero will negate many of the benefits of Personalizer. With this setting, Personalizer uses no user interactions to discover better user interactions. This leads to model stagnation, drift, and ultimately lower performance.
+
+concepts-features.md
+41:* **Strings**: For string types, every combination of key and value creates new weights in the Personalizer machine learning model. 
+45:Features that are not present should be omitted from the request. Avoid sending features with a null value, because it will be processed as existing and with a value of "null" when training the model.
+131:Location information also typically benefits from creating broader classifications. For example, a Latitude-Longitude coordinate such as Lat: 47.67402° N, Long: 122.12154° W is too precise, and forces the model to learn latitude and longitude as distinct dimensions. When you are trying to personalize based on location information, it helps to group location information in larger sectors. An easy way to do that is to choose an appropriate rounding precision for the Lat-Long numbers, and combine latitude and longitude into "areas" by making them into one string. For example, a good way to represent 47.67402° N, Long: 122.12154° W in regions approximately a few kilometers wide would be "location":"34.3 , 12.1".
+
+concept-active-learning.md
+3:description: Learning settings determine the *hyperparameters* of the model training. Two models of the same data that are trained on different learning settings will end up different.
+10:Learning settings determine the *hyperparameters* of the model training. Two models of the same data that are trained on different learning settings will end up different.
+18:Learn [how to](how-to-manage-model.md#import-a-new-learning-policy) import and export a learning policy in the Azure portal for your Personalizer resource.
+22:The settings in the learning policy aren't intended to be changed. Change settings only if you understand how they affect Personalizer. Without this knowledge, you could cause problems, including invalidating Personalizer models.
+24:Personalizer uses [vowpalwabbit](https://github.com/VowpalWabbit) to train and score the events. Refer to the [vowpalwabbit documentation](https://github.com/VowpalWabbit/vowpal_wabbit/wiki/Command-line-arguments) on how to edit the learning settings using vowpalwabbit. Once you have the correct command line arguments, save the command to a file with the following format (replace the arguments property value with the desired command) and upload the file to import learning settings in the **Model and Learning Settings** pane in the Azure portal for your Personalizer resource.
+39:[Upload your own learning policies](how-to-manage-model.md) to compare them with the current learning policy.
+
+concept-rewards.md
+3:description: The reward score indicates how well the personalization choice, RewardActionID, resulted for the user. The value of the reward score is determined by your business logic, based on observations of user behavior. Personalizer trains its machine learning models by evaluating the rewards.
+12:Personalizer trains its machine learning models by evaluating the rewards.
+18:Rewards are sent to Personalizer by the [Reward API](https://docs.microsoft.com/rest/api/cognitiveservices/personalizer/events/reward). Typically, a reward is a number from 0 to 1. A negative reward, with the value of -1, is possible in certain scenarios and should only be used if you are experienced with reinforcement learning (RL). Personalizer trains the model to achieve the highest possible sum of rewards over time.
+71:All rewards for an event, which are received after the **Reward Wait Time**, are discarded and do not affect the training of models.
+91:Personalizer will correlate the information of a Rank call with the rewards sent in Reward calls to train the model. These may come at different times. Personalizer waits for a limited time, starting when the Rank call happened, even if the Rank call was made as an inactive event, and activated later.
+
+concepts-reinforcement-learning.md
+36:The _decision memory_, the model that has been trained to capture the best possible decision, given a context, uses a set of linear models. These have repeatedly shown business results and are a proven approach, partially because they can learn from the real world very rapidly without needing multi-pass training, and partially because they can complement supervised learning models and deep neural network models.
+54:Personalizer currently uses [Vowpal Wabbit](https://github.com/VowpalWabbit/vowpal_wabbit/wiki) as the foundation for the machine learning. This framework allows for maximum throughput and lowest latency when making personalization ranks and training the model with all events.
+
+concepts-offline-evaluation.md
+46:After performing the offline evaluation, you can see the comparative effectiveness of Personalizer with that new policy compared to the current online policy. You can then apply that learning policy to make it effective immediately in Personalizer, by downloading it and uploading it in the Models and Policy panel. You can also download it for future analysis or use.
+73:    Initialize a virtual instance of Personalizer with that policy and a blank model;
+80:            - If they match, train the model on the observed reward in the logs.
+
+concept-apprentice-mode.md
+10:Due to the nature of **real-world** Reinforcement Learning, a Personalizer model can only be trained in a production environment. When deploying a new use case, the Personalizer model is not performing efficiently because it takes time for the model to be sufficiently trained.  **Apprentice mode** is a learning behavior that eases this situation and allows you to gain confidence in the model – without the developer changing any code.
+18:Personalizer trains by mimicking the same output as the application. As more events flow, Personalizer can _catch up_ to the existing application without impacting the existing logic and outcomes. Metrics, available from the Azure portal and the API, help you understand the performance as the model learns.
+28:* Mitigating **Cold Starts**: Apprentice mode helps manage and assess the cost of a "new" model's learning time -  when it is not returning the best action and not achieved a satisfactory level of effectiveness of around 60-80%.
+47:* **Data scientists** can use Apprentice mode to validate that the features are effective to train the Personalizer models, that the reward wait times aren’t too long or short.
+58:|Learning speed|Personalizer will learn more slowly when in Apprentice mode than when learning in Online mode. Apprentice mode can only learn by observing the rewards obtained by your **default action**, which limits the speed of learning, as no exploration can be performed.|Learns faster because it can both exploit the current model and explore for new trends.|
+59:|Learning effectiveness "Ceiling"|Personalizer can approximate, very rarely match, and never exceed the performance of your base business logic (the reward total achieved by the **default action** of each Rank call).|Personalizer should exceed applications baseline, and over time where it stalls you should conduct on offline evaluation and feature evaluation to continue to get improvements to the model. |
+78:Typically for Personalizer, when compared to training with historical data, changing behavior to Apprentice mode and learning from an existing application is a more effective path to having an effective model, with less labor, data engineering, and cleanup work.
+
+concepts-scalability-performance.md
+33:Personalizer works by updating a model that is retrained based on messages sent asynchronously by Personalizer after Rank and Reward APIs. These messages are sent using an Azure EventHub for the application.
+
+ethics-responsible-use.md
+62:* Consider self-fulfilling prophecy loops. This may happen if a personalization reward trains a model so it may subsequently further exclude a demographic group from accessing relevant content. For example, most people in a low-income neighborhood don't obtain a premium insurance offer, and slowly nobody in the neighborhood tends to see the offer at all if there isn't enough exploration.
+63:* Save copies of models and learning policies in case it is necessary to reproduce Personalizer in the future. You can do this periodically or every model refresh period.
+125:* Archive information and assets - such as models, learning policies, and other data - that Personalizer uses to function, to be able to reproduce results.
+144:* *Manage your Personalizer model as a business asset*.  Consider how often to save and back up the model and learning policies behind your Personalizer Loop, and otherwise treat it as an important business asset. Reproducing past results is important for self-audit and measuring improvement.
+158:In some cases, these may be legally required. Consider the tradeoffs in retraining models periodically so they don't contain traces of deleted data.
+
+how-personalizer-works.md
+3:description: The Personalizer _loop_ uses machine learning to build the model that predicts the top action for your content. The model is trained exclusively on your data that you sent to it with the Rank and Reward calls.
+10:The Personalizer resource, your _learning loop_, uses machine learning to build the model that predicts the top action for your content. The model is trained exclusively on your data that you sent to it with the **Rank** and **Reward** calls. Every loop is completely independent of each other.
+12:## Rank and Reward APIs impact the model
+16:* _Exploit_: The current model to decide the best action based on past data.
+21:* Collects data to train the model by recording the features and reward scores of each rank call.
+22:* Uses that data to update the model based on the configuration specified in the _Learning Policy_.
+32:    * Personalizer decides whether to exploit the current model or explore new choices for the model.
+39:    * The AI model is updated based on the correlation results.
+40:    * The inference engine is updated with the new model.
+42:## Personalizer retrains your model
+44:Personalizer retrains your model based on your **Model frequency update** setting on your Personalizer resource in the Azure portal.
+
+how-to-create-resource.md
+3:description: Service configuration includes how the service treats rewards, how often the service explores, how often the model is retrained, and how much data is stored.
+
+includes/change-model-frequency.md
+14:## Change the model update frequency
+16:In the Azure portal, in the Personalizer resource on the **Configuration** page, change the **Model update frequency** to 10 seconds. This short duration will train the service rapidly, allowing you to see how the top action changes for each iteration.
+18:![Change model update frequency](../media/settings/configure-model-update-frequency-settings.png)
+20:When a Personalizer loop is first instantiated, there is no model since there has been no Reward API calls to train from. Rank calls will return equal probabilities for each item. Your application should still always rank content using the output of RewardActionId.
+
+includes/quickstart-sdk-csharp.md
+26:* In the Azure portal, for the Personalizer resource, on the **Configuration** page, change the model update frequency to a very short interval
+33:[!INCLUDE [!Change model frequency](change-model-frequency.md)]
+71:## Object model
+75:To ask for the single best item of the content, create a [RankRequest](https://docs.microsoft.com/dotnet/api/microsoft.azure.cognitiveservices.personalizer.models.rankrequest?view=azure-dotnet-preview), then pass it to [client.Rank](https://docs.microsoft.com/dotnet/api/microsoft.azure.cognitiveservices.personalizer.personalizerclientextensions.rank?view=azure-dotnet-preview) method. The Rank method returns a RankResponse.
+77:To send a reward score to Personalizer, create a [RewardRequest](https://docs.microsoft.com/dotnet/api/microsoft.azure.cognitiveservices.personalizer.models.rewardrequest?view=azure-dotnet-preview), then pass it to the [client.Reward](https://docs.microsoft.com/dotnet/api/microsoft.azure.cognitiveservices.personalizer.personalizerclientextensions.reward?view=azure-dotnet-preview) method.
+
+includes/quickstart-sdk-nodejs.md
+27:* In the Azure portal, for the Personalizer resource, on the **Configuration** page, change the model update frequency to a very short interval
+34:[!INCLUDE [Change model frequency](change-model-frequency.md)]
+64:## Object model
+
+includes/quickstart-sdk-python.md
+27:* In the Azure portal, for the Personalizer resource, on the **Configuration** page, change the model update frequency to a very short interval
+34:[!INCLUDE [Change model frequency](change-model-frequency.md)]
+44:## Object model
+48:To ask for the single best item of the content, create a [RankRequest](https://docs.microsoft.com/python/api/azure-cognitiveservices-personalizer/azure.cognitiveservices.personalizer.models.rankrequest?view=azure-python), then pass it to client.Rank method. The Rank method returns a RankResponse.
+
+how-to-learning-behavior.md
+25:Your existing application shouldn't change how it currently selects actions to display or how the application determines the value, **reward** of that action. The only change to the application might be the order of the actions sent to Personalizer's Rank API. The action your application currently displays is sent as the _first action_ in the action list. The [Rank API](https://westus2.dev.cognitive.microsoft.com/docs/services/personalizer-api/operations/Rank) uses this first action to train your Personalizer model.
+59:When you determine Personalizer is trained with an average of 75-85% rolling average, the model is ready to switch to Online mode.
+67:* [Manage model and learning settings](how-to-manage-model.md)
+
+how-to-settings.md
+3:description: Service configuration includes how the service treats rewards, how often the service explores, how often the model is retrained, and how much data is stored.
+10:Service configuration includes how the service treats rewards, how often the service explores, how often the model is retrained, and how much data is stored.
+19:Because some configuration changes [reset your model](#settings-that-include-resetting-the-model), you should plan your configuration changes.
+25:## Settings that include resetting the model
+27:The following actions trigger a retraining of the model using data available upto the last 2 days.
+32:To [clear](how-to-manage-model.md) all your data, use the **Model and learning settings** page.
+36:Configure the service for your learning loop's use of rewards. Changes to the following values will reset the current Personalizer model and retrain it with the last 2 days of data.
+39:> ![Configure the reward values for the feedback loop](media/settings/configure-model-reward-settings.png)
+51:Personalization is able to discover new patterns and adapt to user behavior changes over time by exploring alternatives instead of using the trained model's prediction. The **Exploration** value determines what percentage of Rank calls are answered with exploration.
+53:Changes to this value will reset the current Personalizer model and retrain it with the last 2 days of data.
+59:<a name="model-update-frequency"></a>
+61:## Configure model update frequency for model training
+63:The **Model update frequency** sets how often the model is trained.
+68:|15 minutes|High model update frequencies are useful for situations where you want to **closely track changes** in user behaviors. Examples include sites that run on live news, viral content, or live product bidding. You could use a 15-minute frequency in these scenarios. |
+71:![Model update frequency sets how often a new Personalizer model is retrained.](media/settings/configure-model-update-frequency-settings-15-minutes.png)
+85:[Learn how to manage your model](how-to-manage-model.md)
+
+how-to-offline-evaluation.md
+55:1. Select **Apply** to apply the policy that improves the model best for your data.
+
+how-to-manage-model.md
+2:title: Manage model and learning settings - Personalizer
+3:description: The machine-learned model and learning settings can be exported for backup in your own source control system.
+8:# How to manage model and learning settings
+10:The machine-learned model and learning settings can be exported for backup in your own source control system.
+12:## Export the Personalizer model
+14:From the Resource management's section for **Model and learning settings**, review model creation and last updated date and export the current model. You can use the Azure portal or the Personalizer APIs to export a model file for archival purposes.
+16:![Export current Personalizer model](media/settings/export-current-personalizer-model.png)
+20:1. In the Azure portal, for your Personalizer resource, on the **Model and learning settings** page, select **Clear data**.
+28:    |Reset the Personalizer model.|This model changes on every retraining. This frequency of training is specified in **upload model frequency** on the **Configuration** page. |
+35:The [learning policy](concept-active-learning.md#understand-learning-policy-settings) settings determine the _hyperparameters_ of the model training. Perform an [offline evaluation](how-to-offline-evaluation.md) to find a new learning policy.
+38:1. Select **Model and learning settings** in the **Resource Management** section.
+46:1. Select **Model and learning settings** in the **Resource Management** section.
+51:[Learn how to manage a learning policy](how-to-manage-model.md)
+
+terminology.md
+15:* **Model**: A Personalizer model captures all data learned about user behavior, getting training data from the combination of the arguments you send to Rank and Reward calls, and with a training behavior determined by the Learning Policy.
+17:* **Online mode**: The default [learning behavior](#learning-behavior) for Personalizer where your learning loop, uses machine learning to build the model that predicts the **top action** for your content.
+19:* **Apprentice mode**: A [learning behavior](#learning-behavior) that helps warm-start a Personalizer model to train without impacting the applications outcomes and actions.
+23:* **Online mode**: Return the best action. Your model will respond to Rank calls with the best action and will use Reward calls to learn and improve its selections over time.
+24:* **[Apprentice mode](concept-apprentice-mode.md)**: Learn as an apprentice. Your model will learn by observing the behavior of your existing system. Rank calls will always return the application's **default action** (baseline).
+34:* **Model update frequency**: How often the model is retrained.
+60:* **Exploitation**: The Personalizer service uses the current model to decide the best action based on past data.
+64:* **Inactive Events**: An inactive event is one where you called Rank, but you're not sure the user will ever see the result, due to client application decisions. Inactive events allow you to create and store personalization results, then decide to discard them later without impacting the machine learning model.
+75:* **Learning Policy**: How Personalizer trains a model on every event will be determined by some parameters that affect how the machine learning algorithm works. A new learning loop starts with a default **Learning Policy**, which can yield moderate performance. When running [Evaluations](concepts-offline-evaluation.md), Personalizer creates new learning policies specifically optimized to the use cases of your loop. Personalizer will perform significantly better with policies optimized for each specific loop, generated during Evaluation. The learning policy is named _learning settings_ on the **Model and learning settings** for the Personalizer resource in the Azure portal.
+
+toc.yml
+22:    displayName: jupyter, notebook, python, cell, graph, chart, aggregate, model update frequency
+27:    displayName: rank, reward, api, explore, exploit, score, design, research, loop, action, context, feature, JSON, event, inactive, model
+71:    displayName: azure, portal, settings, evaluation, offline, policy, export, model, configure
+74:  - name: Manage model and learning settings
+75:    href: how-to-manage-model.md
+
+troubleshooting.md
+16:Some configuration settings [reset your model](how-to-settings.md#settings-that-include-resetting-the-model). Configuration changes should be carefully planned.
+51:Personalizer returns the same probabilities in a Rank API result when it has just started and has an _empty_ model, or when you reset the Personalizer Loop, and your model is still within your **Model update frequency** period.
+53:When the new update period begins, the updated model is used, and you'll see the probabilities change.
+62:You can find the time when the model was last updated in the **Model and Learning Settings** page of the Azure portal. If you see an old timestamp, it is likely because you are not sending the Rank and Reward calls. If the service has no incoming data, it does not update the learning. If you see the learning loop is not updating frequently enough, you can edit the loop's **Model Update frequency**.
+72:The offline evaluation uses the trained model data from the events in that time period. If you did not send any data in the time period between start and end time of the evaluation, it will complete without any results. Submit a new offline evaluation by selecting a time range with events you know were sent to Personalizer.
+78:Learn more about [learning policy concepts](concept-active-learning.md#understand-learning-policy-settings) and [how to apply](how-to-manage-model.md) a new learning policy. If you do not want to select a learning policy, you can use the [offline evaluation](how-to-offline-evaluation.md) to suggest a learning policy, based on your current events.
+90:[Configure the model update frequency](how-to-settings.md#model-update-frequency)
+
+what-is-personalizer.md
+33:The __action__ shown to the user is chosen with machine learning models, trying to maximize the total amount of rewards over time.
+44:* Trained model - past information the Personalizer service received
+73:    |[Apprentice mode](concept-apprentice-mode.md) `E0`|Train the Personalizer model without impacting your existing application, then deploy to Online learning behavior to a production environment|
+
+where-can-you-use-personalizer.md
+76:The [Microsoft Recommenders GitHub repository](https://github.com/Microsoft/Recommenders) provides examples and best practices for building recommendation systems, provided as Jupyter notebooks. It provides working examples for preparing data, building models, evaluating, tuning, and operationalizing the recommendation engines, for many common approaches including xDeepFM, SAR, ALS, RBM, DKN.
+94:In some architectures, the above sequence may be hard to implement. In that case, there is an alternative approach to implementing safeguards after ranking, but a provision needs to be made so actions that fall outside the safeguard are not used to train the Personalizer model.
+
+tutorial-use-personalizer-web-app.md
+41:A **feature** of the model is information about the action or context that can be aggregated (grouped) across members of your web app user base. A feature _isn't_ individually specific (such as a user ID) or highly specific (such as an exact time of day).
+155:## Personalizer model features in a web app
+157:Personalizer needs features for the actions (content) and the current context (user and environment). Features are used to align actions to the current context in the model. The model is a representation of Personalizer's past knowledge about actions, context, and their features that allows it to make educated decisions.
+159:The model, including features, is updated on a schedule based on your **Model update frequency** setting in the Azure portal.
+166:Features should be selected with the same planning and design that you would apply to any schema or model in your technical architecture. The feature values can be set with business logic or third-party systems. Feature values should not be so highly specific that they don't apply across a group or class of features.
+193:      "_DeviceModel": "",
+399:                    "_DeviceModel": "",
+570:* Model update frequency
+
+tutorial-use-azure-notebook-generate-loop-data.md
+80:In the Azure portal, configure your [Personalizer resource](https://ms.portal.azure.com/#create/Microsoft.CognitiveServicesPersonalizer) with the **update model frequency** set to 15 seconds and a **reward wait time** of 15 seconds. These values are found on the **[Configuration](how-to-settings.md#configure-service-settings-in-the-azure-portal)** page.
+84:|update model frequency|15 seconds|
+133:### Get the last model update time
+135:When the function, `get_last_updated`, is called, the function prints out the last modified date and time that the model was updated.
+137:These cells have no output. The function does output the last model training date when called.
+139:The function uses a GET REST API to [get model properties](https://westus2.dev.cognitive.microsoft.com/docs/services/personalizer-api/operations/GetModelProperties).
+142:# ititialize variable for model's last modified date
+143:modelLastModified = ""
+149:    print('-----checking model')
+151:    # get model properties
+152:    response = requests.get(personalization_model_properties_url, headers = headers, params = None)
+162:        print(f'-----model updated: {lastModifiedTime}')
+177:    response = requests.get(personalization_model_policy_url, headers = headers, params = None)
+206:personalization_model_properties_url = personalization_base_url + "personalizer/v1.0/model/properties"
+207:personalization_model_policy_url = personalization_base_url + "personalizer/v1.0/configurations/policy"
+237:get_last_updated(modelLastModified)
+244:Verify that the output's `rewardWaitTime` and `modelExportFrequency` are both set to 15 seconds.
+247:-----checking model
+250:-----model updated: "0001-01-01T00:00:00+00:00"
+255:{'rewardWaitTime': '00:00:15', 'defaultReward': 0.0, 'rewardAggregation': 'earliest', 'explorationPercentage': 0.2, 'modelExportFrequency': '00:00:15', 'logRetentionDays': -1}
+389:The loop runs for `num_requests` times. Personalizer needs a few thousand calls to Rank and Reward to create a model.
+453:def iterations(n, modelCheck, jsonFormat):
+507:        # every N iteration, get last updated model date and time
+508:        if(i % modelCheck == 0):
+512:            get_last_updated(modelLastModified)
+568:This chart shows the success of the model for the current default learning policy.
+593:1. Select the top-most learning policy in the table and select **Apply**. This applies the _best_ learning policy to your model and retrains.
+595:## Change update model frequency to 5 minutes
+598:1. Change the **model update frequency** and **reward wait time** to 5 minutes and select **Save**.
+600:Learn more about the [reward wait time](concept-rewards.md#reward-wait-time) and [model update frequency](how-to-settings.md#model-update-frequency).
+607:Verify that the output's `rewardWaitTime` and `modelExportFrequency` are both set to 5 minutes.
+609:-----checking model
+612:-----model updated: "0001-01-01T00:00:00+00:00"
+617:{'rewardWaitTime': '00:05:00', 'defaultReward': 0.0, 'rewardAggregation': 'earliest', 'explorationPercentage': 0.2, 'modelExportFrequency': '00:05:00', 'logRetentionDays': -1}
