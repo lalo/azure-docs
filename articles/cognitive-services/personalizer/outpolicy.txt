@@ -1,0 +1,103 @@
+concept-active-learning.md
+2:title: Learning policy - Personalizer
+8:# Learning policy and settings
+12:[Learning policy and settings](how-to-settings.md#configure-rewards-for-the-feedback-loop) are set on your Personalizer resource in the Azure portal.
+16:You can import and export learning-policy files from the Azure portal. Use this method to save existing policies, test them, replace them, and archive them in your source code control as artifacts for future reference and audit.
+18:Learn [how to](how-to-manage-model.md#import-a-new-learning-policy) import and export a learning policy in the Azure portal for your Personalizer resource.
+20:## Understand learning policy settings
+22:The settings in the learning policy aren't intended to be changed. Change settings only if you understand how they affect Personalizer. Without this knowledge, you could cause problems, including invalidating Personalizer models.
+26:The following `.json` is an example of a learning policy.
+39:[Upload your own learning policies](how-to-manage-model.md) to compare them with the current learning policy.
+43:Personalizer can create an optimized learning policy in an [offline evaluation](how-to-offline-evaluation.md). An optimized learning policy that has better rewards in an offline evaluation will yield better results when it's used online in Personalizer.
+45:After you optimize a learning policy, you can apply it directly to Personalizer so it immediately replaces the current policy. Or you can save the optimized policy for further evaluation and later decide whether to discard, save, or apply it.
+
+concepts-offline-evaluation.md
+24:    * What are the average rewards achieved by the Personalizer online machine learning policy?
+42:## Discovering the optimized learning policy
+44:Personalizer can use the offline evaluation process to discover a more optimal learning policy automatically.
+46:After performing the offline evaluation, you can see the comparative effectiveness of Personalizer with that new policy compared to the current online policy. You can then apply that learning policy to make it effective immediately in Personalizer, by downloading it and uploading it in the Models and Policy panel. You can also download it for future analysis or use.
+52:|**Online Policy**| The current Learning Policy used in Personalizer |
+54:|**Random Policy**|An imaginary Rank behavior that always returns random choice of Actions from the supplied ones.|
+56:|**Optimized Policy**|If the evaluation was started with the option to discover an optimized policy, it will also be compared, and you will be able to download it or make it the online learning policy, replacing the current one.|
+71:[For a given _learning policy), such as the online learning policy, uploaded learning policies, or optimized candidate policies]:
+73:    Initialize a virtual instance of Personalizer with that policy and a blank model;
+
+concept-feature-evaluation.md
+32:The resulting information about feature importance represents the current Personalizer online model. The evaluation analyzes feature importance of the model saved at the end date of the evaluation period, after undergoing all the training done during the evaluation, with the current online learning policy. 
+
+how-to-manage-model.md
+29:    |Set the learning policy to default.|If you have changed the learning policy as part of an offline evaluation, this resets to the original learning policy.|
+33:## Import a new learning policy
+35:The [learning policy](concept-active-learning.md#understand-learning-policy-settings) settings determine the _hyperparameters_ of the model training. Perform an [offline evaluation](how-to-offline-evaluation.md) to find a new learning policy.
+41:    Wait for the notification that the learning policy was uploaded successfully.
+43:## Export a learning policy
+51:[Learn how to manage a learning policy](how-to-manage-model.md)
+
+how-to-offline-evaluation.md
+26:* The Personalizer loop must have a representative amount of data - as a ballpark we recommend at least 50,000 events in its logs for meaningful evaluation results. Optionally, you may also have previously exported _learning policy_ files you can compare and test in the same evaluation.
+48:Once completed, you can select the evaluation from the list of evaluations, then select **Compare the score of your application with other potential learning settings**. Select this feature when you want to see how your current learning policy performs compared to a new policy.
+50:1. Review the performance of the [learning policies](concepts-offline-evaluation.md#discovering-the-optimized-learning-policy).
+55:1. Select **Apply** to apply the policy that improves the model best for your data.
+
+how-personalizer-works.md
+22:* Uses that data to update the model based on the configuration specified in the _Learning Policy_.
+
+how-to-settings.md
+77:**Data retention period** sets how many days Personalizer keeps data logs. Past data logs are required to perform [offline evaluations](concepts-offline-evaluation.md), which are used to measure the effectiveness of Personalizer and optimize Learning Policy.
+
+out.txt
+9:32:The resulting information about feature importance represents the current Personalizer online model. The evaluation analyzes feature importance of the model saved at the end date of the evaluation period, after undergoing all the training done during the evaluation, with the current online learning policy. 
+28:18:Learn [how to](how-to-manage-model.md#import-a-new-learning-policy) import and export a learning policy in the Azure portal for your Personalizer resource.
+29:22:The settings in the learning policy aren't intended to be changed. Change settings only if you understand how they affect Personalizer. Without this knowledge, you could cause problems, including invalidating Personalizer models.
+31:39:[Upload your own learning policies](how-to-manage-model.md) to compare them with the current learning policy.
+45:46:After performing the offline evaluation, you can see the comparative effectiveness of Personalizer with that new policy compared to the current online policy. You can then apply that learning policy to make it effective immediately in Personalizer, by downloading it and uploading it in the Models and Policy panel. You can also download it for future analysis or use.
+46:73:    Initialize a virtual instance of Personalizer with that policy and a blank model;
+74:22:* Uses that data to update the model based on the configuration specified in the _Learning Policy_.
+132:55:1. Select **Apply** to apply the policy that improves the model best for your data.
+144:35:The [learning policy](concept-active-learning.md#understand-learning-policy-settings) settings determine the _hyperparameters_ of the model training. Perform an [offline evaluation](how-to-offline-evaluation.md) to find a new learning policy.
+147:51:[Learn how to manage a learning policy](how-to-manage-model.md)
+150:15:* **Model**: A Personalizer model captures all data learned about user behavior, getting training data from the combination of the arguments you send to Rank and Reward calls, and with a training behavior determined by the Learning Policy.
+158:75:* **Learning Policy**: How Personalizer trains a model on every event will be determined by some parameters that affect how the machine learning algorithm works. A new learning loop starts with a default **Learning Policy**, which can yield moderate performance. When running [Evaluations](concepts-offline-evaluation.md), Personalizer creates new learning policies specifically optimized to the use cases of your loop. Personalizer will perform significantly better with policies optimized for each specific loop, generated during Evaluation. The learning policy is named _learning settings_ on the **Model and learning settings** for the Personalizer resource in the Azure portal.
+163:71:    displayName: azure, portal, settings, evaluation, offline, policy, export, model, configure
+173:78:Learn more about [learning policy concepts](concept-active-learning.md#understand-learning-policy-settings) and [how to apply](how-to-manage-model.md) a new learning policy. If you do not want to select a learning policy, you can use the [offline evaluation](how-to-offline-evaluation.md) to suggest a learning policy, based on your current events.
+208:177:    response = requests.get(personalization_model_policy_url, headers = headers, params = None)
+210:207:personalization_model_policy_url = personalization_base_url + "personalizer/v1.0/configurations/policy"
+221:568:This chart shows the success of the model for the current default learning policy.
+222:593:1. Select the top-most learning policy in the table and select **Apply**. This applies the _best_ learning policy to your model and retrains.
+
+terminology.md
+15:* **Model**: A Personalizer model captures all data learned about user behavior, getting training data from the combination of the arguments you send to Rank and Reward calls, and with a training behavior determined by the Learning Policy.
+30:* **Rewards**: configure the default values for reward wait time, default reward, and reward aggregation policy.
+73:* **Evaluation**: An offline evaluation determines the best learning policy for your loop based on your application's data.
+75:* **Learning Policy**: How Personalizer trains a model on every event will be determined by some parameters that affect how the machine learning algorithm works. A new learning loop starts with a default **Learning Policy**, which can yield moderate performance. When running [Evaluations](concepts-offline-evaluation.md), Personalizer creates new learning policies specifically optimized to the use cases of your loop. Personalizer will perform significantly better with policies optimized for each specific loop, generated during Evaluation. The learning policy is named _learning settings_ on the **Model and learning settings** for the Personalizer resource in the Azure portal.
+
+toc.yml
+41:    - name: Learning policy
+60:      displayName: learning policy, Counterfactual, features
+71:    displayName: azure, portal, settings, evaluation, offline, policy, export, model, configure
+
+troubleshooting.md
+47:If you are unsure about how your learning loop is currently behaving, run an [offline evaluation](concepts-offline-evaluation.md), and apply the corrected learning policy.
+74:## Learning policy
+76:### How do I import a learning policy?
+78:Learn more about [learning policy concepts](concept-active-learning.md#understand-learning-policy-settings) and [how to apply](how-to-manage-model.md) a new learning policy. If you do not want to select a learning policy, you can use the [offline evaluation](how-to-offline-evaluation.md) to suggest a learning policy, based on your current events.
+
+tutorial-use-azure-notebook-generate-loop-data.md
+48:After the initial requests, run an offline evaluation. This allows Personalizer to review the data and suggest a better learning policy. Apply the new learning policy and run the notebook again with 20% of the previous request count. The loop will perform better with the new learning policy.
+165:### Get policy and service configuration
+176:    # get learning policy
+177:    response = requests.get(personalization_model_policy_url, headers = headers, params = None)
+197:* calls `get_last_updated` method - learning policy has been removed in example output
+207:personalization_model_policy_url = personalization_base_url + "personalizer/v1.0/configurations/policy"
+253:{...learning policy...}
+568:This chart shows the success of the model for the current default learning policy.
+570:![This chart shows the success of the current learning policy for the duration of the test.](./media/tutorial-azure-notebook/azure-notebook-chart-results.png)
+579:In order to find a better learning policy, based on your data to the Rank API, run an [offline evaluation](how-to-offline-evaluation.md) in the portal for your Personalizer loop.
+588:    The purpose of running this offline evaluation is to determine if there is a better learning policy for the features and actions used in this loop. To find that better learning policy, make sure **Optimization Discovery** is turned on.
+593:1. Select the top-most learning policy in the table and select **Apply**. This applies the _best_ learning policy to your model and retrains.
+603:#Verify new learning policy and times
+615:{...learning policy...}
+622:## Validate new learning policy
+
+where-can-you-use-personalizer.md
+39:|Historical data|Your application can retain data for long enough to accumulate a history of at least 100,000 interactions. This allows Personalizer to collect enough data to perform offline evaluations and policy optimization.|
