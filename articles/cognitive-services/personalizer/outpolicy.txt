@@ -101,3 +101,43 @@ tutorial-use-azure-notebook-generate-loop-data.md
 
 where-can-you-use-personalizer.md
 39:|Historical data|Your application can retain data for long enough to accumulate a history of at least 100,000 interactions. This allows Personalizer to collect enough data to perform offline evaluations and policy optimization.|
+concept-active-learning.md
+14:## Import and export learning policies
+16:You can import and export learning-policy files from the Azure portal. Use this method to save existing policies, test them, replace them, and archive them in your source code control as artifacts for future reference and audit.
+35:## Compare learning policies
+37:You can compare how different learning policies perform against past data in Personalizer logs by doing [offline evaluations](concepts-offline-evaluation.md).
+39:[Upload your own learning policies](how-to-manage-model.md) to compare them with the current learning policy.
+41:## Optimize learning policies
+
+concept-feature-evaluation.md
+34:The feature importance results do not represent other policies and models tested or created during the evaluation.  The evaluation will not include features sent to Personalizer after the end of the evaluation period.
+
+concepts-offline-evaluation.md
+27:    * What would have been the comparative effectiveness of different learning policies specified manually?
+31:In addition, Offline Evaluation can be used to discover more optimized learning policies that Personalizer can use to improve results in the future.
+48:Current policies included in the evaluation:
+55:|**Custom Policies**|Additional Learning Policies uploaded when starting the evaluation.|
+71:[For a given _learning policy), such as the online learning policy, uploaded learning policies, or optimized candidate policies]:
+
+ethics-responsible-use.md
+63:* Save copies of models and learning policies in case it is necessary to reproduce Personalizer in the future. You can do this periodically or every model refresh period.
+125:* Archive information and assets - such as models, learning policies, and other data - that Personalizer uses to function, to be able to reproduce results.
+144:* *Manage your Personalizer model as a business asset*.  Consider how often to save and back up the model and learning policies behind your Personalizer Loop, and otherwise treat it as an important business asset. Reproducing past results is important for self-audit and measuring improvement.
+
+how-to-offline-evaluation.md
+46:Evaluations can take a long time to run, depending on the amount of data to process, number of learning policies to compare, and whether an optimization was requested.
+50:1. Review the performance of the [learning policies](concepts-offline-evaluation.md#discovering-the-optimized-learning-policy).
+
+out.txt
+10:34:The feature importance results do not represent other policies and models tested or created during the evaluation.  The evaluation will not include features sent to Personalizer after the end of the evaluation period.
+31:39:[Upload your own learning policies](how-to-manage-model.md) to compare them with the current learning policy.
+63:63:* Save copies of models and learning policies in case it is necessary to reproduce Personalizer in the future. You can do this periodically or every model refresh period.
+64:125:* Archive information and assets - such as models, learning policies, and other data - that Personalizer uses to function, to be able to reproduce results.
+65:144:* *Manage your Personalizer model as a business asset*.  Consider how often to save and back up the model and learning policies behind your Personalizer Loop, and otherwise treat it as an important business asset. Reproducing past results is important for self-audit and measuring improvement.
+158:75:* **Learning Policy**: How Personalizer trains a model on every event will be determined by some parameters that affect how the machine learning algorithm works. A new learning loop starts with a default **Learning Policy**, which can yield moderate performance. When running [Evaluations](concepts-offline-evaluation.md), Personalizer creates new learning policies specifically optimized to the use cases of your loop. Personalizer will perform significantly better with policies optimized for each specific loop, generated during Evaluation. The learning policy is named _learning settings_ on the **Model and learning settings** for the Personalizer resource in the Azure portal.
+
+terminology.md
+75:* **Learning Policy**: How Personalizer trains a model on every event will be determined by some parameters that affect how the machine learning algorithm works. A new learning loop starts with a default **Learning Policy**, which can yield moderate performance. When running [Evaluations](concepts-offline-evaluation.md), Personalizer creates new learning policies specifically optimized to the use cases of your loop. Personalizer will perform significantly better with policies optimized for each specific loop, generated during Evaluation. The learning policy is named _learning settings_ on the **Model and learning settings** for the Personalizer resource in the Azure portal.
+
+tutorial-use-azure-notebook-generate-loop-data.md
+592:1. When the evaluation is completed, select the evaluation then select **Comparison of different learning policies**. This shows the available learning policies and how they would behave with the data.
